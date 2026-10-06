@@ -29,6 +29,8 @@ class User extends Authenticatable
         'name_kh',
         'name_en',
         'email',
+        'telegram_chat_id',
+        'telegram_username',
         'password',
         'profile_image',
         'level',
@@ -128,7 +130,7 @@ class User extends Authenticatable
         }
 
         // សិទ្ធិមូលដ្ឋានដែលមន្ត្រីគ្រប់រូបមានដោយស្វ័យប្រវត្តិ
-        if (in_array($permission, ['profile', 'weekly-reports', 'leave-requests'])) {
+        if (in_array($permission, ['dashboard', 'profile', 'weekly-reports', 'leave-requests', 'inbound-documents'])) {
             return true;
         }
 
@@ -139,7 +141,7 @@ class User extends Authenticatable
 
         // ប្រសិនបើសិទ្ធិជា null ឬទទេ ផ្តល់សិទ្ធិលំនាំដើមរបស់មន្ត្រីទូទៅ
         if (empty($perms) || !is_array($perms)) {
-            return in_array($permission, ['profile', 'my-attendances', 'document-templates', 'work-schedules', 'meeting-rooms', 'weekly-reports', 'leave-requests']);
+            return in_array($permission, ['profile', 'my-attendances', 'document-templates', 'work-schedules', 'meeting-rooms', 'weekly-reports', 'leave-requests', 'inbound-documents']);
         }
 
         return in_array($permission, $perms);

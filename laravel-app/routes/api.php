@@ -16,6 +16,8 @@ use App\Http\Controllers\API\MeetingRoomController;
 use App\Http\Controllers\API\RoomBookingController;
 use App\Http\Controllers\API\WeeklyReportController;
 use App\Http\Controllers\API\LeaveRequestController;
+use App\Http\Controllers\API\InboundDocumentController;
+use App\Http\Controllers\API\HikvisionAttendanceController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -36,8 +38,12 @@ Route::get('/communes/by/district/{id}', [GeoController::class, 'getCommunesByDi
 Route::get('/villages/by/commune/{id}', [GeoController::class, 'getVillagesByCommune']);
 Route::get('/manage/get-dashboard-summary', [AttendanceController::class, 'getDashboardSummary']);
 
-// បន្ថែម Route សម្រាប់ HIKVISION Webhook នៅទីនេះ (Public Route)
-Route::post('/hikvision/webhook', [AttendanceController::class, 'handleWebhook']);
+
+
+// HIKVISION Biometric Event Push (Webhook for Terminals)
+Route::post('/attendance/hikvision/event', [HikvisionAttendanceController::class, 'handleWebhook']);
+Route::post('/attendance/hikvision/webhook', [HikvisionAttendanceController::class, 'handleWebhook']);
+
 
 Route::middleware(['auth:sanctum', 'enabled'])->group(function () {
     Route::post('/signout', [AuthController::class, 'signout']);
@@ -115,6 +121,33 @@ Route::middleware(['auth:sanctum', 'enabled'])->group(function () {
         Route::delete('/{id}', [LeaveRequestController::class, 'destroy']);
         Route::get('/{id}/download-attachment', [LeaveRequestController::class, 'downloadAttachment']);
     });
+
+    // គ្រប់គ្រងលំហូរឯកសារចូលមក ន.ប.ធ. (Inbound Documents)
+    Route::prefix('inbound-documents')->group(function () {
+        Route::get('/generate-number', [InboundDocumentController::class, 'generateNextNumber']);
+        Route::get('/recipients-options', [InboundDocumentController::class, 'recipientsOptions']);
+        Route::get('/stats', [InboundDocumentController::class, 'stats']);
+        Route::post('/telegram-settings', [InboundDocumentController::class, 'updateTelegramSettings']);
+        Route::post('/test-telegram', [InboundDocumentController::class, 'testTelegram']);
+        Route::get('/', [InboundDocumentController::class, 'index']);
+        Route::get('/{id}', [InboundDocumentController::class, 'show']);
+        Route::get('/{id}/routing-slip-data', [InboundDocumentController::class, 'routingSlipData']);
+        Route::post('/', [InboundDocumentController::class, 'store']);
+        Route::match(['PUT', 'POST'], '/{id}', [InboundDocumentController::class, 'update']);
+        Route::patch('/{id}/send-to-assistant', [InboundDocumentController::class, 'sendToAssistant']);
+        Route::post('/{id}/assistant-receive', [InboundDocumentController::class, 'assistantReceiveAndSubmitToDg']);
+        Route::post('/{id}/dg-annotate', [InboundDocumentController::class, 'dgAnnotate']);
+        Route::post('/{id}/assistant-dispatch', [InboundDocumentController::class, 'assistantDispatch']);
+        Route::post('/{id}/forward', [InboundDocumentController::class, 'forward']);
+        Route::post('/{id}/acknowledge', [InboundDocumentController::class, 'acknowledge']);
+        Route::get('/{id}/next-response-approvers', [InboundDocumentController::class, 'getNextResponseApprovers']);
+        Route::post('/{id}/submit-response', [InboundDocumentController::class, 'submitResponseDraft']);
+        Route::post('/{id}/response-action', [InboundDocumentController::class, 'processResponseAction']);
+        Route::get('/{id}/download-original', [InboundDocumentController::class, 'downloadOriginalFile']);
+        Route::get('/{id}/download-annotated', [InboundDocumentController::class, 'downloadAnnotatedFile']);
+        Route::get('/responses/{responseId}/download', [InboundDocumentController::class, 'downloadResponseFile']);
+        Route::delete('/{id}', [InboundDocumentController::class, 'destroy']);
+    });
     
     Route::middleware('admin')->prefix('manage')->group(function () {
         
@@ -173,6 +206,18 @@ Route::middleware(['auth:sanctum', 'enabled'])->group(function () {
         // routeName សម្រាប់រក្សាទុក ឬកែប្រែវត្តមានមន្ត្រី
         Route::post('/attendances/save', [AttendanceController::class, 'store']);
         Route::post('/attendances/import', [AttendanceController::class, 'import']);
+
+        // 5b. HIKVISION Biometric Devices & Logs Management
+        Route::prefix('manage/biometric-devices')->group(function () {
+            Route::get('/', [HikvisionAttendanceController::class, 'getDevices']);
+            Route::post('/', [HikvisionAttendanceController::class, 'storeDevice']);
+            Route::put('/{id}', [HikvisionAttendanceController::class, 'updateDevice']);
+            Route::delete('/{id}', [HikvisionAttendanceController::class, 'deleteDevice']);
+            Route::post('/{id}/test', [HikvisionAttendanceController::class, 'testConnection']);
+            Route::post('/{id}/sync', [HikvisionAttendanceController::class, 'syncDevice']);
+            Route::get('/logs/list', [HikvisionAttendanceController::class, 'getDeviceLogs']);
+            Route::get('/setup-info', [HikvisionAttendanceController::class, 'getSetupInfo']);
+        });
 
         // 6. Document Templates (គ្រប់គ្រងគំរូឯកសារ)
         Route::prefix('document-templates')->group(function () {
