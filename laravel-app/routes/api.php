@@ -36,6 +36,9 @@ Route::get('/communes/by/district/{id}', [GeoController::class, 'getCommunesByDi
 Route::get('/villages/by/commune/{id}', [GeoController::class, 'getVillagesByCommune']);
 Route::get('/manage/get-dashboard-summary', [AttendanceController::class, 'getDashboardSummary']);
 
+// បន្ថែម Route សម្រាប់ HIKVISION Webhook នៅទីនេះ (Public Route)
+Route::post('/hikvision/webhook', [AttendanceController::class, 'handleWebhook']);
+
 Route::middleware(['auth:sanctum', 'enabled'])->group(function () {
     Route::post('/signout', [AuthController::class, 'signout']);
     Route::put('/create/password', [AuthController::class, 'createPassword']);
