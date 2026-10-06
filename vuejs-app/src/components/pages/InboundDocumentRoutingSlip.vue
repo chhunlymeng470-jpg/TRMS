@@ -341,7 +341,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import QRCode from 'qrcode';
+
 import { apiGetRoutingSlipData } from '@/functions/api/inboundDocument';
 import ministryLogo from '@/assets/images/logoImage.webp';
 
