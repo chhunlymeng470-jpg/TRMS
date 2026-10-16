@@ -14,7 +14,7 @@ public function index(Request $request)
     
     $users = \App\Models\User::with(['department', 'position'])
         ->leftJoin('positions', 'users.position_id', '=', 'positions.id')
-        ->orderBy('positions.level', 'asc')
+        ->orderBy('id', 'asc')
         ->select('users.*')
         ->get();
 

@@ -914,7 +914,7 @@ const getStatusBadgeClass = (status) => {
 // 1. Download Sample Excel Template (.xlsx)
 const downloadExcelTemplate = () => {
   const data = attendances.value.map(item => ({
-    'employee_code': item.user?.employee_code || (item.user?.id ? `ID-${item.user.id}` : ''),
+    'employee_code': item.user?.employee_code || (item.user?.id ? `${item.user.id}` : ''),
     'name': item.user?.name_kh || item.user?.name || '',
     'date': selectedDate.value,
     'status': item.status || 'PRESENT',
