@@ -26,8 +26,8 @@
                     </span>
                   </div>
                   <input type="text" class="form-control border-left-0" v-model="searchQuery" placeholder="ស្វែងរកឈ្មោះមន្ត្រី..." />
+                  </div>
                 </div>
-              </div>
               <div class="col-md-5 text-md-right d-flex justify-content-md-end align-items-center flex-wrap">
                 <button @click="openHikvisionModal" class="btn btn-dark px-3 shadow-sm mr-2 mb-1" title="គ្រប់គ្រងម៉ាស៊ីនស្កេនវត្តមាន HIKVISION">
                   <i class="fas fa-fingerprint text-warning mr-1"></i> ម៉ាស៊ីន HIKVISION
@@ -749,13 +749,13 @@ const filteredAttendances = computed(() => {
   if (!searchQuery.value.trim()) {
     return attendances.value;
   }
-  const q = searchQuery.value.toLowerCase().trim();
+    const q = searchQuery.value.toLowerCase().trim();
   return attendances.value.filter(item => {
-    const nameKh = (item.user?.name_kh || '').toLowerCase();
-    const nameEn = (item.user?.name_en || '').toLowerCase();
-    const name = (item.user?.name || '').toLowerCase();
+      const nameKh = (item.user?.name_kh || '').toLowerCase();
+      const nameEn = (item.user?.name_en || '').toLowerCase();
+      const name = (item.user?.name || '').toLowerCase();
     return nameKh.includes(q) || nameEn.includes(q) || name.includes(q);
-  });
+    });
 });
 
 const fetchAttendances = async () => {
@@ -1423,6 +1423,7 @@ const copyWebhookUrl = () => {
 };
 
 onMounted(async () => {
+  await fetchDepartments();
   await fetchAttendances();
   await fetchDevices();
 });
